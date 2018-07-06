@@ -1,7 +1,7 @@
 {
   "name": "@neocxf/dappstore",
   "version": "1.0.0",
-  "description": "```bash\r npm run dev\r ```",
+  "description": "starter kit for developing koajs with typescript",
   "main": "dist/index",
   "typings": "types/index.d.ts",
   "files": [
@@ -22,20 +22,14 @@
   "keywords": [],
   "author": "neo",
   "license": "MIT",
-  "_moduleAliases": {
-    "$": "types"
-  },
   "dependencies": {
     "bcrypt": "^2.0.1",
-    "bcrypt-nodejs": "0.0.3",
     "crypto": "^1.0.1",
     "jsonwebtoken": "^8.3.0",
     "koa": "^2.5.1",
     "koa-body": "^4.0.4",
-    "koa-bodyparser": "^4.2.1",
     "koa-compose": "^4.1.0",
     "koa-router": "^7.4.0",
-    "module-alias": "^2.1.0",
     "mz": "^2.7.0",
     "nodemon": "1.11.0",
     "sequelize": "^4.38.0",
@@ -62,7 +56,6 @@
     "rimraf": "^2.6.2",
     "supertest": "3.0.0",
     "tsc": "1.20150623.0",
-    "tspath": "^1.2.10",
     "typescript": "2.9.2",
     "typescript-eslint-parser": "^3.0.0"
   },

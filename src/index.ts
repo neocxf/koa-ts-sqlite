@@ -1,7 +1,7 @@
 import * as cluster from 'cluster'
 import * as os from 'os'
 import {KoaServer} from './App'
-import {IKoaServer} from "../types/types";
+import {IKoaServer} from "../types";
 import {Worker} from "cluster";
 
 const port = process.env.PORT || 3000;

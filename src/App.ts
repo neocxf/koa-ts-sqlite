@@ -4,7 +4,7 @@ import * as path from 'path'
 import middleware from './middlewares'
 import router from './routes'
 import * as Router from 'koa-router';
-import {IKoaServer} from "../types/types";
+import {IKoaServer} from "../types";
 
 class KoaServer implements IKoaServer{
 	port: number;

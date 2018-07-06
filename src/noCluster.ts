@@ -1,5 +1,5 @@
 import {KoaServer} from "./App";
-import {IKoaServer} from "../types/types";
+import {IKoaServer} from "../types";
 
 const port = process.env.PORT || 3000;
 
