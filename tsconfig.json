@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "outDir": "dist/",
+    "sourceMap": false,
+    "allowJs": true,
+//    "declaration": true,
+//    "declarationDir": "types",
+    "esModuleInterop": false,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "watch": false,
+    "experimentalDecorators": true
+  },
+
+  "include": [
+    "src/**/*.*",
+    "types/**/*.*"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts"
+  ]
+}
