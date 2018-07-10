@@ -11,15 +11,15 @@
   "scripts": {
     "build": "tsc",
     "build:watch": "tsc --watch",
-    "server": "nodemon dist",
     "dev": "npm-run-all clean build  db --parallel server build:watch ",
     "prod": "npm-run-all clean build db server",
-    "prod:build": "npm-run-all clean build",
+    "prod:build": "npm-run-all clean build copy ",
     "db": "sequelize db:migrate && sequelize db:seed:all",
     "test": "tsc && mocha dist/**/*.spec.js",
     "lint": "eslint src --ext ts",
     "tsc": "tsc",
-    "clean": "rimraf -rf dist"
+    "clean": "rimraf -rf dist",
+    "copy": "copy package.json dist"
   },
   "keywords": [],
   "author": "neo",
@@ -49,6 +49,7 @@
     "@types/sqlite3": "^3.1.3",
     "@types/supertest": "^2.0.4",
     "concurrently": "^3.6.0",
+    "copy": "^0.3.2",
     "eslint": "4.0.0",
     "eslint-config-airbnb-base": "11.2.0",
     "eslint-plugin-import": "2.3.0",
