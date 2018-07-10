@@ -13,6 +13,7 @@
     "build:watch": "tsc --watch",
     "server": "nodemon dist",
     "dev": "npm-run-all clean build  db --parallel server build:watch ",
+    "prod": "npm-run-all clean build db server",
     "db": "sequelize db:migrate && sequelize db:seed:all",
     "test": "tsc && mocha dist/**/*.spec.js",
     "lint": "eslint src --ext ts",
@@ -54,8 +55,8 @@
     "mocha": "3.4.2",
     "npm-run-all": "^4.1.3",
     "rimraf": "^2.6.2",
+    "sequelize-cli": "^4.0.0",
     "supertest": "3.0.0",
-    "tsc": "1.20150623.0",
     "typescript": "2.9.2",
     "typescript-eslint-parser": "^3.0.0"
   },

@@ -5,8 +5,6 @@
     "outDir": "dist/",
     "sourceMap": false,
     "allowJs": true,
-//    "declaration": true,
-//    "declarationDir": "types",
     "esModuleInterop": false,
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
