@@ -11,7 +11,8 @@ script:
 - npm run prod:build
 after_success:
 - export SSHPASS=$DEPLOY_PASS
-- sshpass -e  ssh -o stricthostkeychecking=no $DEPLOY_USER@www.neospot.top 'sh ./deploy-to-vps.sh'
+- sshpass -e scp  -o stricthostkeychecking=no deploy-to-vps.sh $DEPLOY_USER@www.neospot.top:/root
+- sshpass -e  ssh -o stricthostkeychecking=no $DEPLOY_USER@www.neospot.top 'sh deploy-to-vps.sh'
 #- sshpass -e scp  -o stricthostkeychecking=no -r ./dist/* $DEPLOY_USER@www.neospot.top:/root/runner/auth
 #- sshpass -e ssh -o stricthostkeychecking=no $DEPLOY_USER@www.neospot.top 'sh ./start-vps-server.sh'
 env:
