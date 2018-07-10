@@ -4,4 +4,3 @@ cd /var/www/dappstore
 
 rm -rf *
 
-
