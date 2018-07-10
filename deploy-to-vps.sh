@@ -9,5 +9,5 @@ cd /root/runner/auth
 
 npm install
 
-export NODE_ENV=development npm run prod
+export NODE_ENV=development && npm run prod
 

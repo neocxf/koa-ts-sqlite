@@ -12,6 +12,7 @@
     "build": "tsc",
     "build:watch": "tsc --watch",
     "dev": "npm-run-all clean build  db --parallel server build:watch ",
+    "server": "nodemon dist",
     "prod": "npm-run-all clean build db server",
     "prod:build": "npm-run-all clean build copy ",
     "db": "sequelize db:migrate && sequelize db:seed:all",
