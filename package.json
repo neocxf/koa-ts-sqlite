@@ -13,7 +13,9 @@
     "build:watch": "tsc --watch",
     "dev": "npm-run-all clean build  db --parallel server build:watch ",
     "server": "nodemon dist",
-    "prod": "npm-run-all clean build db server",
+    "prod:server": "forever start dist",
+    "prod:stop": "forever stop 0",
+    "prod": "npm-run-all clean build db prod:server",
     "prod:build": "npm-run-all clean build copy ",
     "db": "sequelize db:migrate && sequelize db:seed:all",
     "test": "tsc && mocha dist/**/*.spec.js",
@@ -28,6 +30,7 @@
   "dependencies": {
     "bcrypt": "^2.0.1",
     "crypto": "^1.0.1",
+    "forever": "^0.15.3",
     "jsonwebtoken": "^8.3.0",
     "koa": "^2.5.1",
     "koa-body": "^4.0.4",
