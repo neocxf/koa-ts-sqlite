@@ -8,10 +8,12 @@ node_js:
 install:
 - npm install
 script:
-- npm run prod
+- npm run prod:build
 after_success:
 - export SSHPASS=$DEPLOY_PASS
-- sshpass -e scp  -o stricthostkeychecking=no -r ./dist/* $DEPLOY_USER@www.neospot.top:/var/www/dappstore/
+- sshpass -e -o stricthostkeychecking=no $DEPLOY_USER@www.neospot.top 'sh ./deploy-to-vps.sh'
+- sshpass -e scp  -o stricthostkeychecking=no -r ./dist/* $DEPLOY_USER@www.neospot.top:/root/runner/auth
+- sshpass -e -o stricthostkeychecking=no $DEPLOY_USER@www.neospot.top 'sh ./start-vps-server.sh'
 env:
   global:
   - secure: AbhtQ4pLFPlS9M51NcXRqX0p+3rJP610n0PckO1RK5FsXMSulCVdHsqCgZO6rF6CGLwUdFIjVeI6VQPD1YeARp7toFN9uk41uKgaRdKR+VlEwdMzj15EOnHq3RFedRoS9LoBD3+Eovo/uEvpNOz2gNk+DfIUt6ki96s1hNQfcrQaeXHUdtoOOl/60DHGro1DACcGhGQVrZcrh2QhGOROCaVeln5CyfiX0T0LUF06faXQADI33WJzcjVwkuuqQxZ9SQLNVM8Ky+T1iWVeH3bjTWLhhib0THxN5vTRazRUGv0PIoSCZVlljFi5zDFhb1CIZNfiT27ifAOpPVPKFUsGhFNyKk2QovHiyNC9g+C0bkJywTDKZdgfAuAeqoBRmSVfgTx4cZMBDOJxd14hDDqu+z3H1Ubhbz/7AVdTnazFJXdNjKx5zhUEEV0og6EH4rMY9GSkgXoZ60qJKJ+g462UDUS8qWkaokpNEcqpDi1gtYf7iJoFnPMxk69vUDLqiDujtAawfhF1HpFxJZZ92lt1mKPSwjsxG6CswWIVtXR2L5yL8MTkztI9Zd0/DeSEz8dtVDYaH0La8lrihk7oE3UzyW56S9UK9sGIUk4KDF5vlL5pa/V4xCQMwK2WSkFmcGe+/dJN6ubwTEEnnk7FJQkX0haMQaS9Xti+cl+InMysmG4=

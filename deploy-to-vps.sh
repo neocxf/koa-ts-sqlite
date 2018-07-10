@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
-cd /var/www/dappstore
+rm -rf /root/runner/auth
 
-rm -rf *
+mkdir /root/runner/auth
+
+cd /root/runner/auth
+

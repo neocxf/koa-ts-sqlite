@@ -14,6 +14,7 @@
     "server": "nodemon dist",
     "dev": "npm-run-all clean build  db --parallel server build:watch ",
     "prod": "npm-run-all clean build db server",
+    "prod:build": "npm-run-all clean build",
     "db": "sequelize db:migrate && sequelize db:seed:all",
     "test": "tsc && mocha dist/**/*.spec.js",
     "lint": "eslint src --ext ts",
