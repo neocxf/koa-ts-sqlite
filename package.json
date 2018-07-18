@@ -14,7 +14,6 @@
     "dev": "npm-run-all clean build  db --parallel server build:watch ",
     "server": "nodemon dist",
     "prod:server": "forever start dist",
-    "prod:stop": "forever stop 0",
     "prod": "npm-run-all clean build db prod:server",
     "prod:build": "npm-run-all clean build copy ",
     "db": "sequelize db:migrate && sequelize db:seed:all",

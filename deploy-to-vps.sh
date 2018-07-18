@@ -9,7 +9,5 @@ cd /root/runner/auth
 
 npm install
 
-npm run prod:stop
-
-export NODE_ENV=production && export HOST_URL='auth.neospot.top' && npm run prod
+export NODE_ENV=production && export HOST_URL='https://auth.neospot.top' && npm run prod
 

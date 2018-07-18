@@ -132,17 +132,23 @@ class UserController {
 
 		let {name} = ctx.request.query;
 
+		let user = await User.findOne({where: {name: name}})
+
+		if (!user) {
+			ctx.body = {
+				success: false,
+				message: `the username you provided [${name}] does exist, try register first`
+			};
+
+			return;
+		}
+
 		ctx.body = {
 			success: true,
 			message: 'pending to email'
 		};
 
 		process.nextTick(async() => {
-			let user = await User.findOne({where: {name: name}})
-
-			if (!user) {
-				return;
-			}
 
 			let key:string = user.name;
 
