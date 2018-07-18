@@ -22,9 +22,9 @@ class UserController {
 
 	static async viewUser(ctx, next) {
 
-		const user:any = await User.findOne({where: {id: ctx.userId}})
+		const user: any = await User.findOne({where: {id: ctx.userId}})
 
-		let success:boolean = false;
+		let success: boolean = false;
 
 		if (user) {
 			success = true
@@ -36,13 +36,15 @@ class UserController {
 		}
 	}
 
-	static async addUser(ctx: koa.Context, next)  {
+	static async addUser(ctx: koa.Context, next) {
 
 		let user = ctx.request.body;
 
 		let userBody = new UserObject();
 
 		Object2.assignLeft(userBody, user);
+
+		userBody.activated = false;
 
 		let persistUser = await User.findOne({where: {name: userBody.name}})
 
@@ -60,12 +62,70 @@ class UserController {
 		persistUser = await User.create(userBody);
 
 		if (persistUser) {
-			return ctx.body = {
+			ctx.body = {
 				success: true,
 				user: persistUser
 			}
 		}
 
+		process.nextTick(async() => {
+			// send an invitation email
+			ctx.request.query = {
+				name: persistUser.name,
+				email: persistUser.email
+			};
+
+			await UserController.sendActivateInvitation(ctx, next)
+		})
+
+	}
+
+
+	static async sendActivateInvitation(ctx, next) {
+		let {name, email} = ctx.request.query;
+		let key: string = name;
+
+		const user = await User.findOne({where: {name: name, email: email, activated: false}});
+
+		if (! user) {
+			ctx.body = {
+				success: false,
+				message: `the username and email don't match or the account has already activated`
+			};
+			return;
+		}
+
+		let randomVal = crypto.randomBytes(16).toString('hex')
+
+		ResourceManager.redisInstance.setex(key, 120, randomVal)
+
+		await ctx.render('activate-account-email', {
+			name: name,
+			url: `${process.env.HOST_URL || 'http://localhost:3000'}/users/activate-account?name=${name}&token=${randomVal}`
+		});
+
+		sendEmail(email, 'reset password for your account', ctx.body)
+	}
+
+	static async confirmActiveAccount(ctx, next) {
+		let {name, token} = ctx.request.query;
+
+		let tokenStored = await ResourceManager.redisInstance.getAsync(name);
+
+		if (tokenStored !== token) {
+			ctx.body = {
+				success: false,
+				message: 'token already expired, try to resend the invitation again'
+			};
+
+			return;
+		}
+
+		ResourceManager.redisInstance.delAsync(name);
+
+		await User.update({activated: true}, {where: {name: name}});
+
+		await ctx.render('activate-account-success', {name})
 	}
 
 	static async confirmChangePassword(ctx, next) {
@@ -77,25 +137,25 @@ class UserController {
 		}
 
 		let clearRedisTokenPromise = (async () => {
-			let tokenStored  = await ResourceManager.redisInstance.getAsync(name);
+			let tokenStored = await ResourceManager.redisInstance.getAsync(name);
 
 			if (tokenStored !== token) {
 				throw new Error('token already expired, try to reset again');
 			}
 
 			ResourceManager.redisInstance.delAsync(name);
-		}) ();
+		})();
 
 		let genPasswordPromiseFactory = (async () => { // have to wait for the completion of token promise
 			const salt = await bcrypt.genSalt(10);
 
 			let hashPassword = await bcrypt.hash(password, salt);
 
-			return User.update({password: hashPassword}, {where: {name: name}})
+			return User.update({password: hashPassword}, {where: {name: name, activated: true}})
 		});
 
 
-		let findUserPromise = User.findOne( {where: {name: name}});
+		let findUserPromise = User.findOne({where: {name: name, activated: true}});
 
 		let batchPromiseResult;
 
@@ -107,7 +167,7 @@ class UserController {
 				message: 'congratulations, you have successfully change your password, try to login to the system'
 			};
 
-			process.nextTick(async() => {
+			process.nextTick(async () => {
 				await ctx.render('reset-password-email', {name: name});
 
 				sendEmail(batchPromiseResult[1].email, 'reset password confirmed', ctx.body)
@@ -125,7 +185,11 @@ class UserController {
 	static async resetPasswordPage(ctx, next) {
 		let {name, token} = ctx.request.query;
 
-		await ctx.render('reset-password-page', {name, token, url: `${process.env.HOST_URL || 'http://localhost:3000'}/users/confirm_password_reset`});
+		await ctx.render('reset-password-page', {
+			name,
+			token,
+			url: `${process.env.HOST_URL || 'http://localhost:3000'}/users/confirm_password_reset`
+		});
 	}
 
 	static async resetPassword(ctx, next) {
@@ -148,9 +212,9 @@ class UserController {
 			message: 'pending to email'
 		};
 
-		process.nextTick(async() => {
+		process.nextTick(async () => {
 
-			let key:string = user.name;
+			let key: string = user.name;
 
 			let randomVal = crypto.randomBytes(16).toString('hex')
 
@@ -159,7 +223,8 @@ class UserController {
 			await ctx.render('forgot-password-email', {
 				name: user.name,
 				url: `${process.env.HOST_URL || 'http://localhost:3000'}/users/reset-password-page?name=${user.name}&token=${randomVal}`
-			}, () => {});
+			}, () => {
+			});
 
 
 			sendEmail(user.email, 'reset password for your account', ctx.body)
@@ -171,7 +236,7 @@ class UserController {
 
 		const {username, password} = ctx.request.body;
 
-		let persistUser: UserInstance = await User.findOne({where: {name: username}})
+		let persistUser: UserInstance = await User.findOne({where: {name: username}});
 
 		if (!persistUser) {
 			ctx.body = {
@@ -180,6 +245,15 @@ class UserController {
 			};
 
 			return
+		}
+
+		if (!persistUser.activated) {
+			ctx.body = {
+				success: false,
+				message: `user [${username}] don't activated yet, try check the email and activate the account first`
+			};
+
+			return;
 		}
 
 		let isPassMatched = await bcrypt.compare(password, persistUser.password);
@@ -212,14 +286,14 @@ class UserController {
 
 	}
 
-	static async deleteUser(ctx, next)  {
+	static async deleteUser(ctx, next) {
 		ctx.body = {
 			status: 'success',
 			message: 'hello, world!'
 		}
 	}
 
-	static async modifyUser(ctx, next)  {
+	static async modifyUser(ctx, next) {
 		ctx.body = {
 			status: 'success',
 			message: 'hello, world!'

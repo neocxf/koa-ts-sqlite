@@ -50,6 +50,8 @@ router
 
 router
 	.post('/users', koaBody(), UserController.addUser)
+	.get('/users/activate-account',  UserController.confirmActiveAccount)
+	.get('/users/resend-activate-invitation',  UserController.sendActivateInvitation)
 	.post('/users/login', koaBody(), UserController.loginUser)
 
 router.param('id', async(id, ctx: any, next) => {

@@ -9,7 +9,8 @@ export type UserAttributes = {
 	password: string,
 	bonusAddress?: string,
 	img?:  | string,
-	type?: 'user' | string
+	type?: 'user' | string,
+	activated?: boolean
 }
 
 export type UserInstance = sequelize.Instance<UserAttributes> & UserAttributes
@@ -20,7 +21,8 @@ const User = conn.define<UserInstance, UserAttributes>('users', {
   password: sequelize.STRING,
   bonusAddress: sequelize.STRING,
   img: sequelize.STRING,
-  type: sequelize.STRING
+  type: sequelize.STRING,
+	activated: sequelize.BOOLEAN
 })
 
 export enum UserTypeEnum {
@@ -35,6 +37,7 @@ export class UserObject {
 	public bonusAddress: string = ''
 	public img: string = 'http://imgsrc.baidu.com/imgad/pic/item/0823dd54564e925825ed16c49782d158ccbf4e3b.jpg'
 	public type: UserTypeEnum = UserTypeEnum.USER
+	public activated: boolean = false
 
 	public constructor(init?:Partial<UserObject>) {
 		Object.assign(this, init);

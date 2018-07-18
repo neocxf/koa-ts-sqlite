@@ -10,7 +10,8 @@ module.exports = {
         type: 'admin',
         email: 'neocxf@qq.com',
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
+				activated: true
       }], {})
 
       console.log(`the newly added admin id for users table is ${id}`)
