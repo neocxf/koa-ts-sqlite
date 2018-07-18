@@ -1,17 +1,17 @@
 import * as Koa from 'koa'
-import * as fs from 'mz/fs'
 import * as path from 'path'
 import middleware from './middlewares'
 import router from './routes'
 import * as Router from 'koa-router';
 import {IKoaServer} from "../types";
+import * as views from 'koa-views';
 
 class KoaServer implements IKoaServer{
-	port: number;
+	port: number | string;
 	app: Koa;
 	router: Router;
 
-	constructor(port: number = 3000) {
+	constructor(port: string | number = 3000) {
 		this.port = port;
 		this.app = new Koa();
 		this.router = router;
@@ -20,11 +20,19 @@ class KoaServer implements IKoaServer{
 	start() {
 		this.app.use(middleware);
 
-		this.app.use(router.routes());
+		this.app.use(views(path.join(__dirname, '../src', '/template'), {
+			// extension: 'hbs',
+			map: {
+				html: 'handlebars'
+			}
+		}))
+
+		this.app.use(this.router.routes());
 
 		this.app.use(async ctx => {
-			ctx.body = await fs.readFile(path.join(__dirname, '../', 'readme.md'), 'utf8')
-			ctx.type = 'markdown'
+			await ctx.render('index', {
+					theme: 'Koa.js'})
+
 		});
 
 		this.app.listen(this.port).addListener('connection', (data) => {
@@ -35,3 +43,5 @@ class KoaServer implements IKoaServer{
 
 
 export {KoaServer}
+
+export default KoaServer

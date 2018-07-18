@@ -3,6 +3,7 @@ import * as Koa from 'koa';
 import * as Router from "koa-router";
 
 import './global.d'
+import {RedisClient} from "redis";
 
 declare global {
 	type SequelizeAttributes<T extends { [key: string]: any }> = {
@@ -11,9 +12,14 @@ declare global {
 }
 
 declare interface IKoaServer {
-	port: number
+	port: number | string
 	app: Koa
 	router: Router
+
+	start(): void
+}
+
+declare interface IResourceManager {
 
 	start(): void
 }

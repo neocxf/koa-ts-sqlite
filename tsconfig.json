@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "es5",
     "module": "commonjs",
     "outDir": "dist/",
     "sourceMap": false,
@@ -10,7 +10,8 @@
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "watch": false,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "lib": ["dom", "es2017"]
   },
 
   "include": [

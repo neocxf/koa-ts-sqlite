@@ -5,6 +5,8 @@ addons:
     - sshpass
 node_js:
 - node
+before_script:
+- sudo redis-server /etc/redis/redis.conf --port 6379
 install:
 - npm install
 script:
