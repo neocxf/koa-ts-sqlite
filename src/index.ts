@@ -1,3 +1,4 @@
+// global.Promise = require('bluebird')
 import * as cluster from 'cluster'
 import * as os from 'os'
 import {KoaServer} from './App'

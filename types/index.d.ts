@@ -9,6 +9,8 @@ declare global {
 	type SequelizeAttributes<T extends { [key: string]: any }> = {
 		[P in keyof T]: string | DataTypeAbstract | DefineAttributeColumnOptions;
 	};
+
+
 }
 
 declare interface IKoaServer {
@@ -23,3 +25,4 @@ declare interface IResourceManager {
 
 	start(): void
 }
+

@@ -6,12 +6,27 @@ import * as jwt from 'jsonwebtoken'
 import * as crypto from 'crypto'
 import {User, UserInstance, UserObject} from "../models";
 import {Object2} from "../utils";
-import {ResourceManager} from '../database'
+import {ResourceManager} from '../service/index'
 import {sendEmail} from "../service/GlobalService";
+import {sequelize} from '../conn'
+import * as util from "util";
 
 class UserController {
+	static redisGetAsync = (async (string) => {
+	});
+	static redisDelAsync = (async (string) => {
+	});
 
 	static async viewUsers(ctx, next) {
+
+		if (ctx.user.type != 'admin') {
+			ctx.status = 403;
+			ctx.body = {
+				success: false,
+				message: `only type admin user can access the all registration user list`
+			};
+			return;
+		}
 
 		ctx.body = {
 			success: true,
@@ -22,7 +37,17 @@ class UserController {
 
 	static async viewUser(ctx, next) {
 
-		const user: any = await User.findOne({where: {id: ctx.userId}})
+		if (ctx.userId != ctx.user.id) {
+			ctx.status = 401;
+			ctx.body = {
+				success: false,
+				message: `you have no rights to access such endpoint`
+			};
+
+			return;
+		}
+
+		const user = await User.findOne({where: {id: ctx.user.id}});
 
 		let success: boolean = false;
 
@@ -36,22 +61,63 @@ class UserController {
 		}
 	}
 
+	static async checkUsernameExists(ctx: koa.Context, next) {
+		let {username} = ctx.request.query;
+
+		let user = await User.findOne({where: {name: username}});
+
+		let userExists = !!user;
+
+		ctx.body = {
+			success: true,
+			exists: userExists,
+			message: userExists ? `user with name [${username}] exists` : `user with name [${username}] doesn't exists`
+		}
+	}
+
+	static async checkEmailExists(ctx: koa.Context, next) {
+		let {email} = ctx.request.query;
+
+		let user = await User.findOne({where: {email: email}});
+
+		let userExists = !!user;
+
+		ctx.body = {
+			success: true,
+			exists: userExists,
+			message: userExists ? `user with email [${email}] exists` : `user with email [${email}] doesn't exists`
+		}
+
+	}
+
+
 	static async addUser(ctx: koa.Context, next) {
 
 		let user = ctx.request.body;
 
 		let userBody = new UserObject();
 
+		if (user.password != user.password2) {
+			return ctx.body = {
+				success: false,
+				message: 'password should be equals twice'
+			}
+		}
+
 		Object2.assignLeft(userBody, user);
 
 		userBody.activated = false;
 
-		let persistUser = await User.findOne({where: {name: userBody.name}})
+		let persistUser = await User.findOne({
+			where: {
+				[sequelize.Op.or]: [{name: user.name}, {email: user.email}]
+			}
+		});
 
 		if (persistUser) {
 			return ctx.body = {
 				success: false,
-				user: persistUser
+				message: 'use already exists, choose a different name or email address'
 			}
 		}
 
@@ -68,14 +134,14 @@ class UserController {
 			}
 		}
 
-		process.nextTick(async() => {
+		process.nextTick(async () => {
 			// send an invitation email
 			ctx.request.query = {
 				name: persistUser.name,
 				email: persistUser.email
 			};
 
-			await UserController.sendActivateInvitation(ctx, next)
+			UserController.sendActivateInvitation(ctx, next).then()
 		})
 
 	}
@@ -83,11 +149,11 @@ class UserController {
 
 	static async sendActivateInvitation(ctx, next) {
 		let {name, email} = ctx.request.query;
-		let key: string = name;
+		let key: string = `auth_name_${name}`;
 
 		const user = await User.findOne({where: {name: name, email: email, activated: false}});
 
-		if (! user) {
+		if (!user) {
 			ctx.body = {
 				success: false,
 				message: `the username and email don't match or the account has already activated`
@@ -95,22 +161,30 @@ class UserController {
 			return;
 		}
 
-		let randomVal = crypto.randomBytes(16).toString('hex')
+		let randomVal = crypto.randomBytes(16).toString('hex');
 
-		ResourceManager.redisInstance.setex(key, 120, randomVal)
+		ResourceManager.redisInstance.setex(key, 120, randomVal);
 
-		await ctx.render('activate-account-email', {
-			name: name,
-			url: `${process.env.HOST_URL || 'http://localhost:3000'}/users/activate-account?name=${name}&token=${randomVal}`
-		});
+		ctx.body = {
+			success: true,
+			message: 'an invitation letter has been sent to your email, check the email, and hit the link'
+		};
 
-		sendEmail(email, 'reset password for your account', ctx.body)
+		process.nextTick(async () => {
+			await ctx.render('activate-account-email', {
+				name: name,
+				url: `${process.env.HOST_URL || 'http://localhost:3000'}/v1/users/activate-account?name=${name}&token=${randomVal}`
+			});
+
+			sendEmail(email, 'reset password for your account', ctx.body)
+		})
 	}
+
 
 	static async confirmActiveAccount(ctx, next) {
 		let {name, token} = ctx.request.query;
 
-		let tokenStored = await ResourceManager.redisInstance.getAsync(name);
+		let tokenStored = await UserController.redisGetAsync(`auth_name_${name}`);
 
 		if (tokenStored !== token) {
 			ctx.body = {
@@ -121,11 +195,22 @@ class UserController {
 			return;
 		}
 
-		ResourceManager.redisInstance.delAsync(name);
+		{
+			const delPromise = UserController.redisDelAsync(`auth_name_${name}`);
 
-		await User.update({activated: true}, {where: {name: name}});
+			const updateAsync = await User.update({activated: true}, {where: {name: name}});
 
-		await ctx.render('activate-account-success', {name})
+			await Promise.all([delPromise, updateAsync])
+		}
+
+		ctx.body = {
+			success: true,
+			message: `account with name [${name}] has been successfully activated!`
+		};
+
+		process.nextTick(async () => {
+			ctx.render('activate-account-success', {name})
+		})
 	}
 
 	static async confirmChangePassword(ctx, next) {
@@ -137,13 +222,13 @@ class UserController {
 		}
 
 		let clearRedisTokenPromise = (async () => {
-			let tokenStored = await ResourceManager.redisInstance.getAsync(name);
+			let tokenStored = await UserController.redisGetAsync(`auth_reset_pass:${name}`);
 
 			if (tokenStored !== token) {
 				throw new Error('token already expired, try to reset again');
 			}
 
-			ResourceManager.redisInstance.delAsync(name);
+			await UserController.redisDelAsync(`auth_reset_pass:${name}`);
 		})();
 
 		let genPasswordPromiseFactory = (async () => { // have to wait for the completion of token promise
@@ -188,20 +273,20 @@ class UserController {
 		await ctx.render('reset-password-page', {
 			name,
 			token,
-			url: `${process.env.HOST_URL || 'http://localhost:3000'}/users/confirm_password_reset`
+			url: `${process.env.HOST_URL || 'http://localhost:3000'}/v1/users/confirm_password_reset`
 		});
 	}
 
 	static async resetPassword(ctx, next) {
 
-		let {name} = ctx.request.query;
+		let {username, email} = ctx.request.query;
 
-		let user = await User.findOne({where: {name: name}})
+		let user = await User.findOne({where: {name: username, email: email}});
 
 		if (!user) {
 			ctx.body = {
 				success: false,
-				message: `the username you provided [${name}] does exist, try register first`
+				message: `the username you provided [${username}] and [${email}] does exist, try register first`
 			};
 
 			return;
@@ -209,20 +294,20 @@ class UserController {
 
 		ctx.body = {
 			success: true,
-			message: 'pending to email'
+			message: 'pending to email, check your email'
 		};
 
 		process.nextTick(async () => {
 
-			let key: string = user.name;
+			let key: string = `auth_reset_pass:${user.name}`;
 
-			let randomVal = crypto.randomBytes(16).toString('hex')
+			let randomVal = crypto.randomBytes(16).toString('hex');
 
-			ResourceManager.redisInstance.setex(key, 120, randomVal)
+			ResourceManager.redisInstance.setex(key, 120, randomVal);
 
 			await ctx.render('forgot-password-email', {
 				name: user.name,
-				url: `${process.env.HOST_URL || 'http://localhost:3000'}/users/reset-password-page?name=${user.name}&token=${randomVal}`
+				url: `${process.env.HOST_URL || 'http://localhost:3000'}/v1/users/reset-password-page?name=${user.name}&token=${randomVal}`
 			}, () => {
 			});
 
@@ -301,5 +386,10 @@ class UserController {
 	}
 
 }
+
+process.nextTick(async () => {
+	UserController.redisGetAsync = util.promisify(ResourceManager.redisInstance.get).bind(ResourceManager.redisInstance);
+	UserController.redisDelAsync = util.promisify(ResourceManager.redisInstance.del).bind(ResourceManager.redisInstance);
+});
 
 export default UserController

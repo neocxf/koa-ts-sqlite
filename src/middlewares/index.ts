@@ -1,5 +1,7 @@
 import * as compose from 'koa-compose'
 import * as jwt from 'jsonwebtoken'
+import * as util from "util";
+import koa from 'koa'
 
 async function logger(ctx, next) {
 	// ...
@@ -9,7 +11,7 @@ async function logger(ctx, next) {
 	console.log(`${ctx.method} ${ctx.url} - ${ms}ms`);
 }
 
-async function responseTime(ctx, next) {
+async function responseTime(ctx: koa.Context, next) {
 	const start = Date.now();
 	await next();
 	const ms = Date.now() - start;
@@ -20,28 +22,31 @@ async function verifyToken(ctx, next) {
 	const token = ctx.request.headers['authorization'];
 
 	if (token) {
-		let pureToken = token.split(' ')[1]
+		let pureToken = token.split(' ')[1];
 
-		jwt.verify(pureToken, 'dappstore', (err, decoded) => {
-			if (err) {
-				ctx.status = 403;
-				ctx.body = 'invalid token, try to login again';
-				return next()
-			}
+		const verify = util.promisify(jwt.verify).bind(jwt)
 
-			ctx.user = decoded
+		try {
+			ctx.user = await verify(pureToken, 'dappstore');
+		} catch (e) {
+			ctx.status = 403;
+			ctx.body = {
+				success: false,
+				message: 'token expired or invalid token, try login again to get a valid token'
+			};
 
-			next()
-		})
-	} else {
-		await next()
+			return;
+		}
+
 	}
+
+	await next()
 
 }
 
 async function ensureLogin(ctx, next) {
 	if (ctx.user) {
-		next();
+		return await next();
 	}
 
 	const token = ctx.request.headers['authorization'];
@@ -51,6 +56,7 @@ async function ensureLogin(ctx, next) {
 		ctx.body = 'should login first to make the privileged actions'
 	}
 }
+
 
 const all = compose([logger, verifyToken,  responseTime]);
 

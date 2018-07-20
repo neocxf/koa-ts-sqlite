@@ -23,3 +23,4 @@ declare module 'redis' {
 	export function createClient(redis_url: string, options?: ClientOpts): RedisClient;
 	export function createClient(options?: ClientOpts): RedisClient;
 }
+
