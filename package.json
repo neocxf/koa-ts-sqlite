@@ -9,8 +9,8 @@
     "types/"
   ],
   "scripts": {
-    "build": "tsc",
-    "build:watch": "tsc --watch",
+    "build": "gulp scripts",
+    "build:watch": "gulp watch",
     "dev": "npm-run-all clean build  db --parallel server build:watch ",
     "server": "nodemon dist",
     "prod:server": "forever start dist",
@@ -74,6 +74,9 @@
     "eslint-config-airbnb-base": "11.2.0",
     "eslint-plugin-import": "2.3.0",
     "eslint-plugin-promise": "3.5.0",
+    "gulp": "^3.9.1",
+    "gulp-sourcemaps": "^2.6.4",
+    "gulp-typescript": "^5.0.0-alpha.3",
     "mocha": "3.4.2",
     "npm-run-all": "^4.1.3",
     "rimraf": "^2.6.2",
@@ -84,10 +87,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/neocxf/node-ts.git"
+    "url": "git+https://github.com/neocxf/koa-ts-sqlite.git"
   },
   "bugs": {
-    "url": "https://github.com/neocxf/node-ts/issues"
+    "url": "https://github.com/neocxf/koa-ts-sqlite/issues"
   },
-  "homepage": "https://github.com/neocxf/node-ts#readme"
+  "homepage": "https://github.com/neocxf/koa-ts-sqlite#readme"
 }

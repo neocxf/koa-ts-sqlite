@@ -53,7 +53,11 @@ async function ensureLogin(ctx, next) {
 
 	if (!token) {
 		ctx.status= 401;
-		ctx.body = 'should login first to make the privileged actions'
+		ctx.body = {
+			success: false,
+			message: 'should login first to make the privileged actions'
+		}
+
 	}
 }
 

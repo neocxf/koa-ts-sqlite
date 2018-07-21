@@ -23,7 +23,7 @@ class UserController {
 			ctx.status = 403;
 			ctx.body = {
 				success: false,
-				message: `only type admin user can access the all registration user list`
+				message: `only type admin user can access the all registration user list!`
 			};
 			return;
 		}

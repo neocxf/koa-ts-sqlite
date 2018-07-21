@@ -62,7 +62,7 @@ router
  *
  *     deprecated: true
  */
-	.get('/users', UserController.viewUsers)
+	.get('/users', ensureLogin, UserController.viewUsers)
 
 	/**
 	 * @swagger
