@@ -49,7 +49,7 @@ class KoaServer implements IKoaServer{
 			koaSwagger({
 				routePrefix: '/docs',
 				swaggerOptions: {
-					url: `${process.env.HOST_URL || 'http://localhost:3000'}/v1/api-docs.json`, // example path to json
+					url: `${process.env.HOST_FULL_URL || 'http://localhost:3000'}/v1/api-docs.json`, // example path to json
 					requestInterceptor
 				},
 			}),

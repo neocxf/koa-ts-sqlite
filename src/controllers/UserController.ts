@@ -173,7 +173,7 @@ class UserController {
 		process.nextTick(async () => {
 			await ctx.render('activate-account-email', {
 				name: name,
-				url: `${process.env.HOST_URL || 'http://localhost:3000'}/v1/users/activate-account?name=${name}&token=${randomVal}`
+				url: `${process.env.HOST_FULL_URL || 'http://localhost:3000'}/v1/users/activate-account?name=${name}&token=${randomVal}`
 			});
 
 			sendEmail(email, 'reset password for your account', ctx.body)
@@ -273,7 +273,7 @@ class UserController {
 		await ctx.render('reset-password-page', {
 			name,
 			token,
-			url: `${process.env.HOST_URL || 'http://localhost:3000'}/v1/users/confirm_password_reset`
+			url: `${process.env.HOST_FULL_URL || 'http://localhost:3000'}/v1/users/confirm_password_reset`
 		});
 	}
 
@@ -307,7 +307,7 @@ class UserController {
 
 			await ctx.render('forgot-password-email', {
 				name: user.name,
-				url: `${process.env.HOST_URL || 'http://localhost:3000'}/v1/users/reset-password-page?name=${user.name}&token=${randomVal}`
+				url: `${process.env.HOST_FULL_URL || 'http://localhost:3000'}/v1/users/reset-password-page?name=${user.name}&token=${randomVal}`
 			}, () => {
 			});
 
