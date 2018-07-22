@@ -14,7 +14,7 @@
     "start": "npm-run-all --parallel build:watch server",
     "server": "nodemon dist",
     "prod": "npm-run-all clean prod:build prod:server",
-    "prod:server": "forever start --uid='auth' dist",
+    "prod:server": "forever start -a --uid='auth' dist",
     "prod:build": "tsc",
     "prod:stop": "forever stop auth",
     "db": "sequelize db:migrate && sequelize db:seed:all",
