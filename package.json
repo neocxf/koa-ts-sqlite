@@ -1,7 +1,7 @@
 {
-  "name": "@neocxf/dappstore",
+  "name": "@neocxf/koa-ts-sqlite",
   "version": "1.0.0",
-  "description": "starter kit for developing koajs with typescript",
+  "description": "JWT auth implemented using koajs with typescript",
   "main": "dist/index",
   "typings": "types/index.d.ts",
   "files": [
@@ -11,15 +11,14 @@
   "scripts": {
     "build": "gulp scripts",
     "build:watch": "gulp watch",
-    "dev": "npm-run-all clean build  db --parallel server build:watch ",
+    "dev": "npm-run-all --parallel build:watch server",
     "server": "nodemon dist",
     "prod:server": "forever start dist",
-    "prod": "npm-run-all clean build db prod:server",
-    "prod:build": "npm-run-all clean build copy ",
+    "prod": "npm-run-all clean build prod:build prod:server",
+    "prod:build": "tsc",
     "db": "sequelize db:migrate && sequelize db:seed:all",
     "test": "tsc && mocha dist/**/*.spec.js",
     "lint": "eslint src --ext ts",
-    "tsc": "tsc",
     "clean": "rimraf -rf dist",
     "copy": "copy package.json dist"
   },

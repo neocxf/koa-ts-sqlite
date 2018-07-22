@@ -1,17 +1,18 @@
-#!/usr/bin/env bash
+#! /bin/bash
 kill -9 $(lsof -t -i:3000) > /dev/null 2>&1
 
-mv /root/runner/auth/dappstore.sqlite /root
+DEPLOY_PATH=/root/runner/auth
 
-rm -rf /root/runner/auth
+if [ ! -d "$DEPLOY_PATH" ]; then
+    mkdir -p $DEPLOY_PATH
+    git clone https://github.com/neocxf/koa-ts-sqlite $DEPLOY_PATH
+else
+    cd $DEPLOY_PATH
+    git pull origin master
+fi
 
-git clone https://github.com/neocxf/koa-ts-sqlite /root/runner/auth
-
-mv /root/dappstore.sqlite /root/runner/auth
-
-cd /root/runner/auth
+cd $DEPLOY_PATH
 
 npm install
 
 export NODE_ENV=development && export HOST_URL='auth.neospot.top' && export HOST_FULL_URL='https://auth.neospot.top' && npm run prod
-
