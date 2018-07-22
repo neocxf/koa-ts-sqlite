@@ -8,6 +8,7 @@ if [ ! -d "$DEPLOY_PATH" ]; then
     git clone https://github.com/neocxf/koa-ts-sqlite $DEPLOY_PATH
 else
     cd $DEPLOY_PATH
+    git checkout -- .
     git pull origin master
     npm run prod:stop
 fi  
