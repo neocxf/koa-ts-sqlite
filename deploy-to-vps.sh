@@ -1,5 +1,5 @@
 #! /bin/bash
-kill -9 $(lsof -t -i:3000) > /dev/null 2>&1
+# kill -9 $(lsof -t -i:3000) > /dev/null 2>&1
 
 DEPLOY_PATH=/root/runner/auth
 
@@ -9,7 +9,8 @@ if [ ! -d "$DEPLOY_PATH" ]; then
 else
     cd $DEPLOY_PATH
     git pull origin master
-fi
+    npm run prod:stop
+fi  
 
 cd $DEPLOY_PATH
 

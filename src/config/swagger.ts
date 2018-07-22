@@ -6,7 +6,7 @@ export default {
     // openapi: '3.0.0',
     swagger: "2.0",
     info: {
-      description: "neospot authorization service. You can find out more about Neo\'s contribution at [https://www.neospot.top](https://www.neospot.top) or on [github.com, #SFG](http://github.com/neocxf/). For this sample, you can use the api key `special-key` to test the authorization filters.",
+      description: "neospot authorization service. You can find out more about Neo\'s contribution at [https://www.neospot.top](https://www.neospot.top) or on [github.com, #SFG](http://github.com/neocxf/). For this sample, you can use the api key `JWT` to test the authorization filters.",
       title: 'Neo Auth',
       version: '1.0.0',
       contact: {
