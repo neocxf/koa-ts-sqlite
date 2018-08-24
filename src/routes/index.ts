@@ -30,6 +30,19 @@ router
 router
 	.get('/about', about)
 
+router.get('/status', (ctx, next) => {
+	ctx.body = {
+		status: 'UP'
+	}
+})
+
+router.get('/healthcheck', (ctx, next) => {
+	ctx.body = {
+		status: 'GOOD'
+	}
+})
+
+
 
 // router.use(async (ctx, next) => {
 // 	if (ctx.request.method !== 'GET' && ctx.request.headers['content-type'] !== HttpUtils.MediaTypes.JSON && ctx.request.headers['content-type'] !== HttpUtils.MediaTypes.JSON_CHARSET) {

@@ -6,7 +6,7 @@ import * as jwt from 'jsonwebtoken'
 import * as crypto from 'crypto'
 import {User, UserInstance, UserObject} from "../models";
 import {Object2} from "../utils";
-import {ResourceManager} from '../service/index'
+import {ResourceManager} from '../service'
 import {sendEmail} from "../service/GlobalService";
 import {sequelize} from '../conn'
 import * as util from "util";

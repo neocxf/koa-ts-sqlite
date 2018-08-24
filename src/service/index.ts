@@ -20,7 +20,7 @@ class ResourceManager implements IResourceManager{
 
 	start() {
 		if (! this._redisInstance) {
-			this._redisInstance = new IoRedis(6379, process.env.REDIS_URL || 'localhost');
+			this._redisInstance = new IoRedis(6379, process.env.REDIS_URL || 'www.neospot.top');
 		}
 
 		if( ! this._limit) {

@@ -17,4 +17,4 @@ cd $DEPLOY_PATH
 
 npm install
 
-export NODE_ENV=development && export HOST_URL='auth.neospot.top' && export HOST_FULL_URL='https://auth.neospot.top' && npm run prod
+export PORT=3000 && export NODE_ENV=development && export HOST_URL='auth.neospot.top' && export HOST_FULL_URL='https://auth.neospot.top' && npm run prod

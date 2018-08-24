@@ -8,7 +8,7 @@ import * as swaggerJSDoc from 'swagger-jsdoc'
 import {IKoaServer} from "../types";
 import * as views from 'koa-views';
 import swaggerConfig from './config/swagger';
-
+import {connectToEureka} from './lib/eureka'
 
 class KoaServer implements IKoaServer{
 	port: number | string;
@@ -22,6 +22,10 @@ class KoaServer implements IKoaServer{
 	}
 
 	start() {
+		process.nextTick(() => {
+			connectToEureka();
+		});
+
 		this.app.use(middleware);
 
 		this.app.use(views(path.join(__dirname, '../src', '/template'), {
