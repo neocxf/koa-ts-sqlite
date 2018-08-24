@@ -26,7 +26,7 @@ const client = new Eureka({
 	},
 	eureka: {
 		// eureka server host / port
-		host: 'localhost',
+		host: 'www.neospot.top',
 		port: 8761,
 		servicePath: '/eureka/apps/'
 	},
