@@ -3,7 +3,7 @@ import * as path from 'path'
 import middleware from './middlewares'
 import router from './routes'
 import * as Router from 'koa-router';
-import * as koaSwagger from 'koa2-swagger-ui'
+import koaSwagger from 'koa2-swagger-ui'
 import * as swaggerJSDoc from 'swagger-jsdoc'
 import {IKoaServer} from "../types";
 import * as views from 'koa-views';
@@ -23,7 +23,7 @@ class KoaServer implements IKoaServer{
 
 	start() {
 		process.nextTick(() => {
-			connectToEureka();
+			// connectToEureka();
 		});
 
 		this.app.use(middleware);
@@ -54,7 +54,6 @@ class KoaServer implements IKoaServer{
 				routePrefix: '/docs',
 				swaggerOptions: {
 					url: `${process.env.HOST_FULL_URL || 'http://localhost:3000'}/v1/api-docs.json`, // example path to json
-					requestInterceptor
 				},
 			}),
 		);
